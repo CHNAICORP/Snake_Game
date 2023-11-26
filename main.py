@@ -5,9 +5,9 @@ import random
 # 初始化 Pygame
 pygame.init()
 
-# 设置屏幕尺寸
+# 设置屏幕尺寸并启用双缓冲
 width, height = 800, 600
-screen = pygame.display.set_mode((width, height))
+screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
 
 # 设置标题
 pygame.display.set_caption('贪吃蛇游戏')
@@ -93,67 +93,24 @@ def game_contents(snake_speed):
     # 游戏状态初始化
     game_over = False
     game_close = False
-
     # 蛇的大小
     snake_block = 10
     # 变量控制着蛇的移动速度。这个变量的值越大，蛇的速度就越慢。
     snake_speed = snake_speed
-
     Length_of_snake = 1  # 初始化蛇的长度
     # 蛇的存储数组
     snake_list = []
-
     # 定义蛇的头部初始位置
     x1 = round(random.randrange(0, width - snake_block) / 10.0) * 10.0
     y1 = round(random.randrange(0, height - snake_block) / 10.0) * 10.0
-
     # 初始速度
     x1_change = snake_block  # 蛇开始时向右移动
     y1_change = 0           # y 方向上不移动
-
     # 随机生成食物的位置
     foodx = round(random.randrange(0, width - snake_block) / 10.0) * 10.0
     foody = round(random.randrange(0, height - snake_block) / 10.0) * 10.0
 
     while not game_over:    # 游戏的主循环
-        while game_close == True:
-            # 清空屏幕
-            screen.fill(white)
-            # 显示游戏结束的信息
-            message_display('Game Over! Press C to Play Again or Q to Quit.')
-            pygame.display.update()
-
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    key = event.key
-                    if key == pygame.K_q or key == pygame.K_c:
-                        key = chr(key).lower()  # 将按键转换为小写字母
-                        if key == 'q':
-                            pygame.quit()
-                            quit()
-                        elif key == 'c':
-                            game_close = False  # 退出这个循环，重置游戏状态
-                            game_over = False   # 修改这里，使游戏可以重新开始
-
-                            # 重置蛇的位置和长度
-                            snake_list = []
-                            Length_of_snake = 1
-
-                            # 重新设置蛇的头部位置
-                            # 定义蛇的头部初始位置
-                            x1 = round(random.randrange(
-                                0, width - snake_block) / 10.0) * 10.0
-                            y1 = round(random.randrange(
-                                0, height - snake_block) / 10.0) * 10.0
-
-                            # 重新生成食物的位置
-                            foodx = round(random.randrange(
-                                0, width - snake_block) / 10.0) * 10.0
-                            foody = round(random.randrange(
-                                0, height - snake_block) / 10.0) * 10.0
-
-                            break  # 重要：退出事件循环，以便重新开始游戏
-
         for event in pygame.event.get():
             # 用户点击窗口的关闭按钮，退出游戏
             if event.type == pygame.QUIT:
@@ -178,32 +135,25 @@ def game_contents(snake_speed):
         # 检查蛇是否碰到边界
         if x1 >= width or x1 < 0 or y1 >= height or y1 < 0:
             game_close = True
-
         # 保持游戏窗口背景
         screen.fill(white)
-
         # 绘制食物
         pygame.draw.rect(screen, red, [foodx, foody, snake_block, snake_block])
-
         # 存储蛇的头部
         snake_head = []
         snake_head.append(x1)
         snake_head.append(y1)
         snake_list.append(snake_head)
-
         # 处理蛇的移动
         if len(snake_list) > Length_of_snake:
             del snake_list[0]
-
         # 处理蛇的碰撞检测
         for x in snake_list[:-1]:
             if x == snake_head:
                 game_close = True
-
         # 将蛇绘制到屏幕上
         our_snake(snake_block, snake_list)
         pygame.display.update()
-
         # 当蛇吃到食物时
         if x1 == foodx and y1 == foody:
             foodx = round(random.randrange(
@@ -211,10 +161,34 @@ def game_contents(snake_speed):
             foody = round(random.randrange(
                 0, height - snake_block) / 10.0) * 10.0
             Length_of_snake += 1
-
         # 设置游戏速度
         time.sleep(1.0 / snake_speed)
 
+        while game_close == True:
+            # 清空屏幕
+            screen.fill(white)
+            # 显示游戏结束的信息
+            message_display('Game Over! Press C to Play Again or Q to Quit.')
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    key = event.key
+                    if key == pygame.K_q or key == pygame.K_c:
+                        key = chr(key).lower()  # 将按键转换为小写字母
+                        if key == 'q':
+                            pygame.quit()
+                            quit()
+                        elif key == 'c':
+                            game_over = True
+                            game_close = False
+                            return_to_main_menu = True  # 设置标志，表示需要返回主菜单
+                            break
+    # 在函数末尾，添加屏幕清理和刷新
+    screen.fill(white)  # 清空屏幕
+    pygame.display.update()  # 立即更新屏幕显示
+    # 在函数的最后返回这个标志
+    return return_to_main_menu
+    
 # 游戏主界面
 def gameLoop():
     running = True # 游戏循环
@@ -223,6 +197,7 @@ def gameLoop():
     increase_snake_speed_button = show_button(font, "Increase speed", (525, 125))
     reduce_snake_speed_button = show_button(font, "Reduce speed", (525, 425))
     while running:
+        screen.fill(white)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -230,7 +205,9 @@ def gameLoop():
                 x, y = pygame.mouse.get_pos()  # 获取鼠标的位置
                 # 检查鼠标是否点击了按钮
                 if start_button.button_position[0] < x < start_button.button_position[0] + start_button.button_size[0] and start_button.button_position[1] < y < start_button.button_position[1] + start_button.button_size[1]:
-                    game_contents(show_snake_speed_button.snake_speed) # 开始游戏
+                    return_to_main_menu = game_contents(show_snake_speed_button.snake_speed) # 开始游戏
+                    if return_to_main_menu:
+                        continue  # 如果需要返回主菜单，则继续显示主菜单
                 if increase_snake_speed_button.button_position[0] < x < increase_snake_speed_button.button_position[0] + increase_snake_speed_button.button_size[0] and increase_snake_speed_button.button_position[1] < y < increase_snake_speed_button.button_position[1] + increase_snake_speed_button.button_size[1]:
                     increase_snake_speed_button.increase_snake_speed()
                     print("increase snake speed!", increase_snake_speed_button.snake_speed)
@@ -238,6 +215,9 @@ def gameLoop():
                     reduce_snake_speed_button.reduce_snake_speed()
                     print("reduce snake speed!", reduce_snake_speed_button.snake_speed)
         # 显示设置按钮
+        start_button.set_button()
+        increase_snake_speed_button.set_button()
+        reduce_snake_speed_button.set_button()
         show_snake_speed_button.show_snake_speed()
         # 更新整个游戏窗口
         pygame.display.flip()
