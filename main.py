@@ -1,3 +1,4 @@
+import sys
 import pygame
 import time
 import random
@@ -176,7 +177,7 @@ def game_contents(snake_speed):
                         key = chr(key).lower()  # 将按键转换为小写字母
                         if key == 'q':
                             pygame.quit()
-                            quit()
+                            sys.exit()
                         elif key == 'c':
                             game_over = True
                             game_close = False
