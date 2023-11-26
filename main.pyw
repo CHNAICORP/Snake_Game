@@ -1,3 +1,4 @@
+import sys
 import pygame
 import time
 import random
@@ -16,7 +17,7 @@ pygame.display.set_caption('贪吃蛇游戏')
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
-# 创建一个字体对象
+# 创建一个字体对象  
 font = pygame.font.Font(None, 25)
 
 # 定义按钮类
@@ -176,7 +177,7 @@ def game_contents(snake_speed):
                         key = chr(key).lower()  # 将按键转换为小写字母
                         if key == 'q':
                             pygame.quit()
-                            quit()
+                            sys.exit()
                         elif key == 'c':
                             game_over = True
                             game_close = False
