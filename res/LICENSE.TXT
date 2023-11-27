@@ -1,0 +1,2 @@
+Greedy Snake Game - Github Open Source Project
+Can be used for personal research and commercial use

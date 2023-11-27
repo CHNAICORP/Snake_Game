@@ -1,0 +1,1 @@
+This program only runs on Windows systems and currently does not support Linux and MacOS
